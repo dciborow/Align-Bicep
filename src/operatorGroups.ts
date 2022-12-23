@@ -3,7 +3,8 @@ export const operatorGroups = {
 	binary: ['+', '-', '*', '/', '??', '**', '..'],
 	comparison: ['===', '!==', '==', '!=', '>=', '<='],
 	comma: [','],
-	index: ['.', '->', '=>'],
+	index: ['.', '->', '=>', 'param'],
+	types: ['string', 'int'],
 };
 
 export const operatorsGroup: {
@@ -18,6 +19,7 @@ export const operatorsGroup: {
 );
 const operatorsSorted = [
 	...operatorGroups.assignment,
+	...operatorGroups.types,
 	...operatorGroups.binary,
 	...operatorGroups.comparison,
 	...operatorGroups.comma,
@@ -28,7 +30,7 @@ export const getLineMatch = () =>
 		`(.*?(.))(${operatorsSorted
 			.map(
 				(operator) =>
-					operator.replace(/(.)/g, '\\$1') +
+					(operatorsGroup[operator] === 'types' ? operator : operator.replace(/(.)/g, '\\$1')) +
 					(operatorsGroup[operator] === 'binary' ? '(?=\\s)' : '')
 			)
 			.join('|')})`,
