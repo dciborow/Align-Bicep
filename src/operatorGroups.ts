@@ -4,18 +4,19 @@ export const operatorGroups = {
 	comparison: ['===', '!==', '==', '!=', '>=', '<='],
 	comma: [],
 	index: ['.', '->', '=>'],
-	jsx: ['<', '>', '/>'],  // Add JSX-related operators
+	jsx: ['<', '>', '/>'],  // JSX-related operators
 	types: ['string', 'int', 'object', 'bool', 'array', 'securestring', 'secureObject'],
 };
 
-// Extend the operatorsGroup mapping
-(Object.keys(
-	operatorGroups
-) as (keyof typeof operatorGroups)[]).forEach((groupName) =>
-	operatorGroups[groupName].forEach(
-		(operator) => (operatorsGroup[operator] = groupName)
-	)
-);
+// Define the operatorsGroup mapping object
+export const operatorsGroup: { [operator: string]: keyof typeof operatorGroups } = {};
+
+// Populate the operatorsGroup with mappings
+(Object.keys(operatorGroups) as (keyof typeof operatorGroups)[]).forEach(groupName => {
+	operatorGroups[groupName].forEach(operator => {
+		operatorsGroup[operator] = groupName;
+	});
+});
 
 const operatorsSorted = [
 	...operatorGroups.assignment,
@@ -24,7 +25,7 @@ const operatorsSorted = [
 	...operatorGroups.comparison,
 	...operatorGroups.comma,
 	...operatorGroups.jsx,  // Add JSX operators to the sorted list
-].sort((a, b) => b.length - a.length); //naive regex escape
+].sort((a, b) => b.length - a.length); // naive regex escape
 
 export const getLineMatch = () =>
 	new RegExp(
