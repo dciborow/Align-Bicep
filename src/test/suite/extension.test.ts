@@ -43,12 +43,15 @@ suite('Bicep Test Suite', () => {
 		assert.strictEqual(test4.parts[1].operatorType, 'assignment');
 	});
 
-	const case5 = '<Route path="/" element={<HomePage />} />';
+	const case5 = '<Route path="/monitor" element={<MonitorPage />} />';
 	const test5 = LineData.fromString(case5);
 	test('Test JSX Attributes', () => {
 		assert.strictEqual(test5.prefix, '', 'JSX prefix should be empty');
-		assert.strictEqual(test5.parts.length, 3, 'JSX should be split into three parts');
-		assert.strictEqual(test5.parts[0].text, '<Route path="/" element={<HomePage} ');
+		assert.strictEqual(test5.parts.length, 5, 'JSX should be split into five parts');
+		assert.strictEqual(test5.parts[0].text, '<Route path="');
+		assert.strictEqual(test5.parts[0].operator, '/');
+		assert.strictEqual(test5.parts[0].operatorType, 'jsx');
+		assert.strictEqual(test5.parts[1].text, '" element={<MonitorPage} ');
 		assert.strictEqual(test5.parts[1].operator, '>');
 		assert.strictEqual(test5.parts[1].operatorType, 'jsx');
 		assert.strictEqual(test5.parts[2].operator, '/>');
