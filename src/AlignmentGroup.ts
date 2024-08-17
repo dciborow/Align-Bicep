@@ -44,9 +44,11 @@ export default class AlignmentGroup {
 
         const textWidth = part.text.length - 1;
 
-        if (characterOffset + textWidth < 0)
+        if (characterOffset + textWidth < 0) {          
           //Can't apply letter spacing if there's no character before the operator
           return;
+        }
+
         if (offsetWidth > 0) {
           (decorations.decorations[offsetWidth] ??= []).push(
             new vscode.Range(
