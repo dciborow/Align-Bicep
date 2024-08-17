@@ -1,121 +1,122 @@
 {
-	"name": "align-bicep",
-	"version": "0.3.3",
-	"displayName": "Align Bicep",
-	"publisher": "microsoft-dciborow",
-	"description": "Align Bicep files without modifying the code",
-	"icon": "images/icon.png",
-	"repository": {
-		"url": "https://github.com/dciborow/Align-Bicep"
-	},
-	"engines": {
-		"vscode": "^1.53.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"extensionKind": [
-		"ui",
-		"workspace"
-	],
-	"activationEvents": [
-		"onStartupFinished"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "align-bicep.toggle",
-				"title": "Align Spaces: Toggle"
-			},
-			{
-				"command": "align-bicep.realign",
-				"title": "Align Spaces: Realign"
-			}
-		],
-		"configuration": {
-			"title": "Align Spaces",
-			"properties": {
-				"align-bicep.allowed-language-ids": {
-					"anyOf": [
-						{
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						},
-						{
-							"type": "null"
-						}
-					],
-					"default": null,
-					"description": "If set to an array, only activate for the given languages."
-				},
-				"align-bicep.disallowed-language-ids": {
-					"anyOf": [
-						{
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						},
-						{
-							"type": "null"
-						}
-					],
-					"default": null,
-					"description": "If set to an array, do not activate for the given languages."
-				},
-				"align-bicep.delay": {
-					"anyof": [
-						{
-							"type": "number"
-						},
-						{
-							"const": "off"
-						}
-					],
-					"default": 0,
-					"description": "If set to a number, this defines the number of milliseconds to wait before realigning. <=0 means no delay.\n\nIf set to `\"off\"`, automatic realignment is prevented and you must run the `align-https://github.com/dciborow/Align-Bicep.realign` command."
-				}
-			}
-		},
-		"keybindings": [
-			{
-				"key": "ctrl+shift+=",
-				"command": "align-bicep.toggle"
-			},
-			{
-				"key": "ctrl+shift+\\",
-				"command": "align-bicep.realign"
-			}
-		],
-		"untrustedWorkspaces": {
-			"supported": true
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "yarn run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "yarn run compile && yarn run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.53.0",
-		"@typescript-eslint/eslint-plugin": "^4.23.0",
-		"@typescript-eslint/parser": "^4.23.0",
-		"eslint": "^7.26.0",
-		"glob": "^7.1.6",
-		"mocha": "^10.7.3",
-		"typescript": "^4.1.3",
-		"vscode-test": "^1.5.0"
-	},
-	"dependencies": {
-		"prettier": "^2.8.1"
-	}
+  "name": "align-bicep",
+  "version": "0.3.3",
+  "displayName": "Align Bicep",
+  "publisher": "microsoft-dciborow",
+  "description": "Align Bicep files without modifying the code",
+  "icon": "images/icon.png",
+  "repository": {
+    "url": "https://github.com/dciborow/Align-Bicep"
+  },
+  "engines": {
+    "vscode": "^1.53.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "align-bicep.toggle",
+        "title": "Align Spaces: Toggle"
+      },
+      {
+        "command": "align-bicep.realign",
+        "title": "Align Spaces: Realign"
+      }
+    ],
+    "configuration": {
+      "title": "Align Spaces",
+      "properties": {
+        "align-bicep.allowed-language-ids": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "If set to an array, only activate for the given languages."
+        },
+        "align-bicep.disallowed-language-ids": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "If set to an array, do not activate for the given languages."
+        },
+        "align-bicep.delay": {
+          "anyof": [
+            {
+              "type": "number"
+            },
+            {
+              "const": "off"
+            }
+          ],
+          "default": 0,
+          "description": "If set to a number, this defines the number of milliseconds to wait before realigning. <=0 means no delay.\n\nIf set to `\"off\"`, automatic realignment is prevented and you must run the `align-https://github.com/dciborow/Align-Bicep.realign` command."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "key": "ctrl+shift+=",
+        "command": "align-bicep.toggle"
+      },
+      {
+        "key": "ctrl+shift+\\",
+        "command": "align-bicep.realign"
+      }
+    ],
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.4",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.53.0",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "eslint": "^7.26.0",
+    "glob": "^7.1.6",
+    "mocha": "^10.7.3",
+    "typescript": "^4.1.3",
+    "vscode-test": "^1.5.0"
+  },
+  "dependencies": {
+    "prettier": "^2.8.1"
+  }
 }

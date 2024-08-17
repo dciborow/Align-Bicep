@@ -1,12 +1,12 @@
 // If you can read this, you are too close
 
-import { setTimeout } from 'timers';
-import * as vscode from 'vscode';
-import AlignmentGroup from './AlignmentGroup';
-import DecorationSet from './DecorationSet';
-import DecorationTypeStore from './DecorationTypeStore';
-import LineData from './LineData';
-import { getLineMatch } from './operatorGroups';
+import { setTimeout } from "timers";
+import * as vscode from "vscode";
+import AlignmentGroup from "./AlignmentGroup";
+import DecorationSet from "./DecorationSet";
+import DecorationTypeStore from "./DecorationTypeStore";
+import LineData from "./LineData";
+import { getLineMatch } from "./operatorGroups";
 
 // Hi, If you're reading this, you're probably interested to know how this
 // extension works.
@@ -95,16 +95,16 @@ import { getLineMatch } from './operatorGroups';
 	wide.
 */
 
-const EXTENSION_ID = 'align-bicep';
+const EXTENSION_ID = "align-bicep";
 
 interface ExtensionConfig extends vscode.WorkspaceConfiguration {
-	'allowed-language-ids': string[] | null;
-	'disallowed-language-ids': string[] | null;
-	delay: number | 'off';
-	// TODO:
-	// [languageId: string]: {
-	// 	'line-comment': string | null;
-	// } | null;
+  "allowed-language-ids": string[] | null;
+  "disallowed-language-ids": string[] | null;
+  delay: number | "off";
+  // TODO:
+  // [languageId: string]: {
+  // 	'line-comment': string | null;
+  // } | null;
 }
 
 const disposables: vscode.Disposable[] = [];
@@ -112,257 +112,257 @@ const disposables: vscode.Disposable[] = [];
 let active = true;
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log(`Extension "${EXTENSION_ID}" is now active!`);
+  console.log(`Extension "${EXTENSION_ID}" is now active!`);
 
-	disposables.push(
-		vscode.commands.registerCommand('align-bicep.toggle', () => {
-			active = !active;
-			if (active) {
-				decorateCurrentEditor(false);
-			} else {
-				clearDecorations();
-			}
-		}),
-		vscode.commands.registerCommand('align-bicep.realign', () => {
-			if (active) {
-				decorateCurrentEditor(false);
-			}
-		})
-	);
+  disposables.push(
+    vscode.commands.registerCommand("align-bicep.toggle", () => {
+      active = !active;
+      if (active) {
+        decorateCurrentEditor(false);
+      } else {
+        clearDecorations();
+      }
+    }),
+    vscode.commands.registerCommand("align-bicep.realign", () => {
+      if (active) {
+        decorateCurrentEditor(false);
+      }
+    })
+  );
 
-	const onChangeTextHandler = (
-		event: vscode.TextDocumentChangeEvent | vscode.TextDocument
-	) => {
-		const doc = 'document' in event ? event.document : event;
+  const onChangeTextHandler = (
+    event: vscode.TextDocumentChangeEvent | vscode.TextDocument
+  ) => {
+    const doc = "document" in event ? event.document : event;
 
-		const openEditor = vscode.window.visibleTextEditors.find(
-			(editor) => editor.document.uri === doc.uri
-		);
+    const openEditor = vscode.window.visibleTextEditors.find(
+      (editor) => editor.document.uri === doc.uri
+    );
 
-		if (openEditor) {
-			decorateDebounced(openEditor);
-		}
-	};
+    if (openEditor) {
+      decorateDebounced(openEditor);
+    }
+  };
 
-	function decorateCurrentEditor(debounce: boolean) {
-		const currentEditor = vscode.window.activeTextEditor;
-		if (!currentEditor) {
-			return;
-		}
+  function decorateCurrentEditor(debounce: boolean) {
+    const currentEditor = vscode.window.activeTextEditor;
+    if (!currentEditor) {
+      return;
+    }
 
-		const languageId = currentEditor.document.languageId;
+    const languageId = currentEditor.document.languageId;
 
-		if (shouldDecorateLanguage(languageId)) {
-			if (debounce) {
-				decorateDebounced(currentEditor);
-			} else {
-				decorate(currentEditor);
-			}
-		} else {
-			clearDecorations();
-		}
-	}
+    if (shouldDecorateLanguage(languageId)) {
+      if (debounce) {
+        decorateDebounced(currentEditor);
+      } else {
+        decorate(currentEditor);
+      }
+    } else {
+      clearDecorations();
+    }
+  }
 
-	vscode.workspace.onDidChangeTextDocument(onChangeTextHandler);
-	// vscode.workspace.onDidOpenTextDocument(onChangeTextHandler);
+  vscode.workspace.onDidChangeTextDocument(onChangeTextHandler);
+  // vscode.workspace.onDidOpenTextDocument(onChangeTextHandler);
 
-	vscode.window.onDidChangeActiveTextEditor(
-		(editor: vscode.TextEditor | undefined) => {
-			if (!editor) {
-				return;
-			}
+  vscode.window.onDidChangeActiveTextEditor(
+    (editor: vscode.TextEditor | undefined) => {
+      if (!editor) {
+        return;
+      }
 
-			decorate(editor);
-		}
-	);
+      decorate(editor);
+    }
+  );
 
-	vscode.workspace.onDidChangeConfiguration((e) => {
-		if (e.affectsConfiguration(EXTENSION_ID)) {
-			loadConfig();
+  vscode.workspace.onDidChangeConfiguration((e) => {
+    if (e.affectsConfiguration(EXTENSION_ID)) {
+      loadConfig();
 
-			decorateCurrentEditor(false);
-		}
-	});
+      decorateCurrentEditor(false);
+    }
+  });
 
-	loadConfig();
+  loadConfig();
 
-	decorateCurrentEditor(false);
+  decorateCurrentEditor(false);
 }
 
 const config: {
-	current: ExtensionConfig;
+  current: ExtensionConfig;
 } = {
-	current: vscode.workspace.getConfiguration(EXTENSION_ID) as ExtensionConfig,
+  current: vscode.workspace.getConfiguration(EXTENSION_ID) as ExtensionConfig,
 };
 
 function loadConfig() {
-	config.current = vscode.workspace.getConfiguration(
-		EXTENSION_ID
-	) as ExtensionConfig;
+  config.current = vscode.workspace.getConfiguration(
+    EXTENSION_ID
+  ) as ExtensionConfig;
 
-	for (const setting of ['allowed-language-ids', 'disallowed-language-ids']) {
-		if (config.current[setting] !== null) {
-			if (
-				!(config.current[setting] instanceof Array) ||
-				config.current[setting].some((t: any) => typeof t !== 'string')
-			) {
-				(config.current as any)[setting] = null;
-				console.warn(`Invalid "${setting}" setting`);
-			}
-		}
-	}
+  for (const setting of ["allowed-language-ids", "disallowed-language-ids"]) {
+    if (config.current[setting] !== null) {
+      if (
+        !(config.current[setting] instanceof Array) ||
+        config.current[setting].some((t: any) => typeof t !== "string")
+      ) {
+        (config.current as any)[setting] = null;
+        console.warn(`Invalid "${setting}" setting`);
+      }
+    }
+  }
 
-	if (config.current.delay !== 'off') {
-		if (typeof config.current.delay !== 'number') {
-			config.current.delay = 'off';
-		}
-	}
+  if (config.current.delay !== "off") {
+    if (typeof config.current.delay !== "number") {
+      config.current.delay = "off";
+    }
+  }
 }
 
 export const decorationTypes = new DecorationTypeStore();
 disposables.push(decorationTypes);
 
 export function getPhysicalWidth(line: string) {
-	return line
-		.split('')
-		.map((ch, i) => (ch === '\t' ? 4 - ((i + 1) % 4) + 3 : 1))
-		.reduce((a, b) => a + b, 0);
+  return line
+    .split("")
+    .map((ch, i) => (ch === "\t" ? 4 - ((i + 1) % 4) + 3 : 1))
+    .reduce((a, b) => a + b, 0);
 }
 
 class ThingBuilder<T> {
-	public current: T | null = null;
+  public current: T | null = null;
 
-	private _all: T[] = [];
+  private _all: T[] = [];
 
-	get all() {
-		return this._all;
-	}
+  get all() {
+    return this._all;
+  }
 
-	push(next?: T) {
-		if (this.current !== null) {
-			this._all.push(this.current);
-		}
+  push(next?: T) {
+    if (this.current !== null) {
+      this._all.push(this.current);
+    }
 
-		this.current = next === undefined ? null : next;
-	}
+    this.current = next === undefined ? null : next;
+  }
 }
 
 function obfuscateStrings(str: string) {
-	return str.replace(
-		/(?<!\\)("|`)(.*?)(?<!\\)\1/g,
-		(_match, quote, content) => quote + content.replace(/./g, ' ') + quote
-	);
+  return str.replace(
+    /(?<!\\)("|`)(.*?)(?<!\\)\1/g,
+    (_match, quote, content) => quote + content.replace(/./g, " ") + quote
+  );
 }
 
 function shouldDecorateLanguage(id: string) {
-	if (
-		config.current['allowed-language-ids'] === null &&
-		config.current['disallowed-language-ids'] === null
-	) {
-		return true;
-	}
+  if (
+    config.current["allowed-language-ids"] === null &&
+    config.current["disallowed-language-ids"] === null
+  ) {
+    return true;
+  }
 
-	if (config.current['disallowed-language-ids'] !== null) {
-		if (config.current['disallowed-language-ids'].includes(id)) {
-			return false;
-		}
-	}
-	if (config.current['allowed-language-ids'] !== null) {
-		return config.current['allowed-language-ids'].includes(id);
-	}
-	return true;
+  if (config.current["disallowed-language-ids"] !== null) {
+    if (config.current["disallowed-language-ids"].includes(id)) {
+      return false;
+    }
+  }
+  if (config.current["allowed-language-ids"] !== null) {
+    return config.current["allowed-language-ids"].includes(id);
+  }
+  return true;
 }
 
 function clearDecorations() {
-	decorationTypes.reset();
+  decorationTypes.reset();
 }
 
 let timeoutId: null | number = null;
 function decorateDebounced(editor: vscode.TextEditor) {
-	if (!shouldDecorateLanguage(editor.document.languageId)) {
-		return;
-	}
+  if (!shouldDecorateLanguage(editor.document.languageId)) {
+    return;
+  }
 
-	const delay = config.current.delay;
+  const delay = config.current.delay;
 
-	if (delay === 'off') {
-		return;
-	}
+  if (delay === "off") {
+    return;
+  }
 
-	if (delay <= 0) {
-		decorate(editor);
-		return;
-	}
+  if (delay <= 0) {
+    decorate(editor);
+    return;
+  }
 
-	// Getting nodejs typings for these timeout functions for some reason
-	if (timeoutId) {
-		(clearTimeout as unknown as (id: number) => void)(timeoutId);
-		timeoutId = null;
-	}
+  // Getting nodejs typings for these timeout functions for some reason
+  if (timeoutId) {
+    (clearTimeout as unknown as (id: number) => void)(timeoutId);
+    timeoutId = null;
+  }
 
-	timeoutId = (
-		setTimeout as unknown as (callback: () => void, delay: number) => number
-	)(() => {
-		decorate(editor);
-		timeoutId = null;
-	}, delay);
+  timeoutId = (
+    setTimeout as unknown as (callback: () => void, delay: number) => number
+  )(() => {
+    decorate(editor);
+    timeoutId = null;
+  }, delay);
 }
 
 function decorate(editor: vscode.TextEditor) {
-	if (!active) {
-		return;
-	}
+  if (!active) {
+    return;
+  }
 
-	if (!shouldDecorateLanguage(editor.document.languageId)) {
-		return;
-	}
+  if (!shouldDecorateLanguage(editor.document.languageId)) {
+    return;
+  }
 
-	clearDecorations();
+  clearDecorations();
 
-	let sourceCode = editor.document.getText();
+  let sourceCode = editor.document.getText();
 
-	const sourceCodeArr = sourceCode.split('\n');
+  const sourceCodeArr = sourceCode.split("\n");
 
-	const groupBuilder = new ThingBuilder<AlignmentGroup>();
+  const groupBuilder = new ThingBuilder<AlignmentGroup>();
 
-	for (let line = 0; line < sourceCodeArr.length; line++) {
-		const lineMatch = getLineMatch();
+  for (let line = 0; line < sourceCodeArr.length; line++) {
+    const lineMatch = getLineMatch();
 
-		const lineString = obfuscateStrings(sourceCodeArr[line]);
+    const lineString = obfuscateStrings(sourceCodeArr[line]);
 
-		if (!lineMatch.test(lineString)) {
-			groupBuilder.push();
-			continue;
-		}
+    if (!lineMatch.test(lineString)) {
+      groupBuilder.push();
+      continue;
+    }
 
-		const stuff = LineData.fromString(lineString);
+    const stuff = LineData.fromString(lineString);
 
-		if (
-			groupBuilder.current &&
-			!groupBuilder.current.isLineStuffCompatible(stuff)
-		) {
-			groupBuilder.push();
-		}
+    if (
+      groupBuilder.current &&
+      !groupBuilder.current.isLineStuffCompatible(stuff)
+    ) {
+      groupBuilder.push();
+    }
 
-		if (groupBuilder.current === null) {
-			groupBuilder.current = new AlignmentGroup(line, [stuff]);
-			continue;
-		}
+    if (groupBuilder.current === null) {
+      groupBuilder.current = new AlignmentGroup(line, [stuff]);
+      continue;
+    }
 
-		groupBuilder.current.lines.push(stuff);
-	}
-	groupBuilder.push();
+    groupBuilder.current.lines.push(stuff);
+  }
+  groupBuilder.push();
 
-	const groups = groupBuilder.all;
+  const groups = groupBuilder.all;
 
-	const decorators = groups
-		.map((group) => group.resolveAlignment())
-		.reduce((all, curr) => all.combine(curr), new DecorationSet());
+  const decorators = groups
+    .map((group) => group.resolveAlignment())
+    .reduce((all, curr) => all.combine(curr), new DecorationSet());
 
-	decorators.apply(editor);
+  decorators.apply(editor);
 }
 
 export function deactivate() {
-	disposables.forEach((d) => d.dispose());
-	console.log('Extension "align-bicep" deactivated.');
+  disposables.forEach((d) => d.dispose());
+  console.log('Extension "align-bicep" deactivated.');
 }
