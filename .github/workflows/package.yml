@@ -41,7 +41,7 @@ jobs:
           committer_email: actions@github.com
           add: package.json
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         if: steps.tag_version.outputs.release_type
         with:
           node-version: '16.x'  # Specify your Node.js version
