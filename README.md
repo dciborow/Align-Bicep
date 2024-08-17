@@ -1,4 +1,5 @@
 # Align Bicep
+
 Based on https://github.com/OldStarchy/Align-Spaces
 
 Aligns certain operators by visually stretching the leading characters, this way you can have groups of aligned code, without having to deal with meaningless whitespace changes in your commits.
@@ -28,7 +29,7 @@ param enableVNET bool = false
 param isZoneRedundant bool = false
 param storageAccountType string = isZoneRedundant ? 'Standard_ZRS' : 'Standard_LRS'
 
-// Aligns Nested Values 
+// Aligns Nested Values
 
 var networkAcls = enableVNET ? {
   defaultAction: 'Deny'
@@ -79,7 +80,7 @@ The source file is not changed, nor are extra characters shown in the browser (s
 
 ## Known Issues
 
--   Rectangular selections are borked
+- Rectangular selections are borked
 
 ## Release Notes
 

@@ -6,7 +6,7 @@
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": "src",
-    
+
     // Relax type-checking
     "strict": false, // Turn off all strict type-checking options
     "noImplicitAny": false, // Allow implicit any types
@@ -18,8 +18,5 @@
     "skipLibCheck": true, // Skip type-checking of declaration files for faster builds
     "forceConsistentCasingInFileNames": true // Prevent case-sensitivity issues
   },
-  "exclude": [
-    "node_modules",
-    ".vscode-test"
-  ]
+  "exclude": ["node_modules", ".vscode-test"]
 }

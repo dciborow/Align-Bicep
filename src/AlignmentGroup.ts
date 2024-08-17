@@ -3,10 +3,7 @@ import DecorationSet from "./DecorationSet";
 import LineData from "./LineData";
 
 export default class AlignmentGroup {
-  constructor(
-    public lineStart: number,
-    public lines: LineData[],
-  ) {}
+  constructor(public lineStart: number, public lines: LineData[]) {}
 
   isLineStuffCompatible(other: LineData) {
     const incompatible = this.lines.some((line) => !line.compare(other));
@@ -44,7 +41,7 @@ export default class AlignmentGroup {
 
         const textWidth = part.text.length - 1;
 
-        if (characterOffset + textWidth < 0) {          
+        if (characterOffset + textWidth < 0) {
           //Can't apply letter spacing if there's no character before the operator
           return;
         }
@@ -55,8 +52,8 @@ export default class AlignmentGroup {
               currentLine,
               characterOffset + textWidth,
               currentLine,
-              characterOffset + textWidth + 1,
-            ),
+              characterOffset + textWidth + 1
+            )
           );
         }
 
