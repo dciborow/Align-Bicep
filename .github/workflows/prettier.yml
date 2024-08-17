@@ -72,16 +72,3 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 2
-      - id: review
-        uses: amiedd/action-gpt@amiedd/static-analysis
-        with:
-          GIT_COMMIT_HASH: ${{ github.event.pull_request.head.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          REPOSITORY_NAME: ${{ github.repository }}
-          AZURE_OPENAI_API: ${{ secrets.AZURE_OPENAI_API }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          PATCH_PR: ${{ github.event.pull_request.number }}
-          PATCH_REPO: ${{ github.repository }}
