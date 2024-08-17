@@ -1,79 +1,60 @@
-import { getPhysicalWidth } from './extension';
-import LinePart from './LinePart';
-import { getLineMatch, operatorsGroup } from './operatorGroups';
+static fromString(line: string) {
+	const lineMatch = getLineMatch();
 
-export default class LineData {
-	constructor(
-		public indentation: string,
-		public prefix: string,
-		public parts: LinePart[]
-	) {}
+	// Adjust indentation regex to account for JSX syntax
+	const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
+	const parts: LinePart[] = [];
 
-	static fromString(line: string) {
-		const lineMatch = getLineMatch();
+	for (
+		let match: RegExpExecArray | null = null;
+		(match = lineMatch.exec(line));
+	) {
+		const [part, text, decoratorChar, operator] = match;
 
-		//TODO: including comments as "indentation" is hardcoded here. It should be configurable per language
-		const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
-		const parts: LinePart[] = [];
-
-		for (
-			let match: RegExpExecArray | null = null;
-			(match = lineMatch.exec(line));
-
-		) {
-			const [part, text, decoratorChar, operator] = match;
-
-			const width = getPhysicalWidth(part);
-			const operatorWidth = getPhysicalWidth(operator);
-			const decorationLocation = text.length;
-			const operatorType = operatorsGroup[operator];
-			const length = part.length;
-
-			parts.push({
-				text,
-				length,
-				width,
-				operator,
-				operatorWidth,
-				operatorType,
-				decorationLocation,
-				decoratorChar,
-			});
+		// Special handling for JSX operators and attributes
+		if (operator === '<' || operator === '>' || operator === '/>') {
+			// Treat JSX tags as separate parts
+			const jsxPart = {
+				text: part,
+				length: part.length,
+				width: getPhysicalWidth(part),
+				operator: operator,
+				operatorWidth: getPhysicalWidth(operator),
+				operatorType: 'jsx',
+				decorationLocation: text.length,
+				decoratorChar: decoratorChar,
+			};
+			parts.push(jsxPart);
+			continue;
 		}
 
-		// https://github.com/aNickzz/Align-Spaces/issues/13
-		// if (parts[parts.length - 1].operator === ',') {
-		// 	parts.pop();
-		// }
+		// Existing logic for other operators
+		const width = getPhysicalWidth(part);
+		const operatorWidth = getPhysicalWidth(operator);
+		const decorationLocation = text.length;
+		const operatorType = operatorsGroup[operator];
+		const length = part.length;
 
-		let prefix = '';
-
-		if (parts.length > 0 && parts[0].operatorType === 'assignment') {
-			const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
-			if (prefixMatch) {
-				prefix = prefixMatch[1];
-			}
-		}
-
-		return new LineData(indentation, prefix, parts);
+		parts.push({
+			text,
+			length,
+			width,
+			operator,
+			operatorWidth,
+			operatorType,
+			decorationLocation,
+			decoratorChar,
+		});
 	}
 
-	compare(other: LineData) {
-		if (this.indentation !== other.indentation) {
-			return false;
-		}
-		if (this.prefix !== other.prefix) {
-			return false;
-		}
+	let prefix = '';
 
-		const lim = Math.min(this.parts.length, other.parts.length);
-
-		for (let i = 0; i < lim; i++) {
-			if (this.parts[i].operatorType !== other.parts[i].operatorType) {
-				return false;
-			}
+	if (parts.length > 0 && parts[0].operatorType === 'assignment') {
+		const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
+		if (prefixMatch) {
+			prefix = prefixMatch[1];
 		}
-
-		return true;
 	}
+
+	return new LineData(indentation, prefix, parts);
 }
