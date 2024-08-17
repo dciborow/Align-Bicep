@@ -21,6 +21,12 @@ jobs:
       - name: Install dependencies
         run: npm ci  # Use `npm install` if you don't have a `package-lock.json`
 
+      - name: Install xvfb
+        run: sudo apt-get install xvfb
+
+      - name: Start xvfb
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" npm test
+
       - name: Run tests
         run: npm test  # Adjust this command if your test script is named differently
 
