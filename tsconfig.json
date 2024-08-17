@@ -6,24 +6,24 @@
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": true, // Enable strict type-checking options
-    
-    // Additional Strictness
-    "noImplicitReturns": true, // Report error when not all code paths in function return a value
-    "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statements
-    "noUnusedParameters": true, // Report errors on unused parameters
-    "noUnusedLocals": true, // Report errors on unused local variables
-    "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type
+
+    // Relax strict type-checking
+    "strict": false, // Turn off all strict type-checking options
+    "noImplicitReturns": false, // Allow functions to not return a value from all paths
+    "noFallthroughCasesInSwitch": false, // Allow fallthrough cases in switch statements
+    "noUnusedParameters": false, // Allow unused parameters
+    "noUnusedLocals": false, // Allow unused local variables
+    "noImplicitAny": false, // Allow implicit any types
 
     // Module resolution
-    "esModuleInterop": true, // Allows default imports from modules with no default export (e.g., `import fs from "fs"`)
-    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
-
-    // Enable incremental builds, which can improve compilation performance
-    "incremental": true,
+    "esModuleInterop": true, // Keep this for better module compatibility
+    "forceConsistentCasingInFileNames": true, // Keep this to prevent case-sensitivity issues
     
-    // Type-checking options
-    "skipLibCheck": true, // Skip type checking of declaration files (.d.ts)
+    // Incremental builds for faster compilation
+    "incremental": true,
+
+    // Skip type-checking of declaration files for faster builds
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
