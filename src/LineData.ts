@@ -1,5 +1,5 @@
 import { getPhysicalWidth } from './extension';
-import { operatorGroups } from './operatorGroups';
+import { getLineMatch, operatorGroups } from './operatorGroups';
 import LinePart from './LinePart';
 
 export default class LineData {
@@ -43,7 +43,7 @@ export default class LineData {
 			const width = getPhysicalWidth(part);
 			const operatorWidth = getPhysicalWidth(operator);
 			const decorationLocation = text.length;
-			const operatorType = operatorGroups[operator];
+			const operatorType = operatorGroups[operator as keyof typeof operatorGroups]; // Ensure TypeScript knows the operator is a key of operatorGroups
 			const length = part.length;
 
 			const linePart: LinePart = {
