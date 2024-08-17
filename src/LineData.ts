@@ -1,6 +1,6 @@
 import { getPhysicalWidth } from './extension';
+import { getLineMatch, operatorGroups } from './operatorGroups';
 import LinePart from './LinePart';
-import { getLineMatch, operatorsGroup } from './operatorGroups';
 
 export default class LineData {
 	constructor(
@@ -25,16 +25,16 @@ export default class LineData {
 			// Special handling for JSX operators and attributes
 			if (operator === '<' || operator === '>' || operator === '/>') {
 				// Treat JSX tags as separate parts
-				const jsxPart = new LinePart(
-					part,
-					part.length,
-					getPhysicalWidth(part),
-					operator,
-					getPhysicalWidth(operator),
-					'jsx',
-					text.length,
-					decoratorChar
-				);
+				const jsxPart: LinePart = {
+					text: part,
+					length: part.length,
+					width: getPhysicalWidth(part),
+					operator: operator,
+					operatorWidth: getPhysicalWidth(operator),
+					operatorType: 'jsx', // Explicitly set as 'jsx'
+					decorationLocation: text.length,
+					decoratorChar: decoratorChar,
+				};
 				parts.push(jsxPart);
 				continue;
 			}
@@ -43,26 +43,32 @@ export default class LineData {
 			const width = getPhysicalWidth(part);
 			const operatorWidth = getPhysicalWidth(operator);
 			const decorationLocation = text.length;
-			const operatorType = operatorsGroup[operator];
-			const length = part.length;
 
-			const linePart = new LinePart(
+			// Find the correct operator group (e.g., "assignment", "binary")
+			let operatorType: keyof typeof operatorGroups | undefined = undefined;
+			for (const group in operatorGroups) {
+				if (operatorGroups[group as keyof typeof operatorGroups].includes(operator)) {
+					operatorType = group as keyof typeof operatorGroups;
+					break;
+				}
+			}
+
+			if (!operatorType) {
+				throw new Error(`Unknown operator type for operator: ${operator}`);
+			}
+
+			const linePart: LinePart = {
 				text,
-				length,
+				length: part.length, // Correct reference
 				width,
 				operator,
 				operatorWidth,
-				operatorType,
+				operatorType: operatorType as keyof typeof operatorGroups, // Explicitly cast as valid operatorType
 				decorationLocation,
-				decoratorChar
-			);
+				decoratorChar,
+			};
 			parts.push(linePart);
 		}
-
-		// https://github.com/aNickzz/Align-Spaces/issues/13
-		// if (parts[parts.length - 1].operator === ',') {
-		// 	parts.pop();
-		// }
 
 		let prefix = '';
 
