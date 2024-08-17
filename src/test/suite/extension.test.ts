@@ -47,9 +47,11 @@ suite('Bicep Test Suite', () => {
 	const test5 = LineData.fromString(case5);
 	test('Test JSX Attributes', () => {
 		assert.strictEqual(test5.prefix, '', 'JSX prefix should be empty');
-		assert.strictEqual(test5.parts.length, 2, 'JSX should be split into two parts');
+		assert.strictEqual(test5.parts.length, 3, 'JSX should be split into three parts');
 		assert.strictEqual(test5.parts[0].text, '<Route path="/" element={<HomePage} ');
-		assert.strictEqual(test5.parts[1].operator, '/>');
+		assert.strictEqual(test5.parts[1].operator, '>');
 		assert.strictEqual(test5.parts[1].operatorType, 'jsx');
+		assert.strictEqual(test5.parts[2].operator, '/>');
+		assert.strictEqual(test5.parts[2].operatorType, 'jsx');
 	});
 });
