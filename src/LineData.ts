@@ -31,7 +31,7 @@ export default class LineData {
 					width: getPhysicalWidth(part),
 					operator: operator,
 					operatorWidth: getPhysicalWidth(operator),
-					operatorType: 'jsx',
+					operatorType: 'jsx', // Explicitly set as 'jsx'
 					decorationLocation: text.length,
 					decoratorChar: decoratorChar,
 				};
@@ -63,7 +63,7 @@ export default class LineData {
 				width,
 				operator,
 				operatorWidth,
-				operatorType,
+				operatorType: operatorType as keyof typeof operatorGroups, // Explicitly cast as valid operatorType
 				decorationLocation,
 				decoratorChar,
 			};
