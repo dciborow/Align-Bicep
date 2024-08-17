@@ -6,24 +6,17 @@
     "lib": ["es6"],
     "sourceMap": true,
     "rootDir": "src",
-
-    // Relax strict type-checking
+    
+    // Relax type-checking
     "strict": false, // Turn off all strict type-checking options
-    "noImplicitReturns": false, // Allow functions to not return a value from all paths
-    "noFallthroughCasesInSwitch": false, // Allow fallthrough cases in switch statements
-    "noUnusedParameters": false, // Allow unused parameters
-    "noUnusedLocals": false, // Allow unused local variables
     "noImplicitAny": false, // Allow implicit any types
+    "noImplicitThis": false, // Allow implicit `this` types
+    "alwaysStrict": false, // Do not enforce strict mode in emitted code
 
     // Module resolution
     "esModuleInterop": true, // Keep this for better module compatibility
-    "forceConsistentCasingInFileNames": true, // Keep this to prevent case-sensitivity issues
-    
-    // Incremental builds for faster compilation
-    "incremental": true,
-
-    // Skip type-checking of declaration files for faster builds
-    "skipLibCheck": true
+    "skipLibCheck": true, // Skip type-checking of declaration files for faster builds
+    "forceConsistentCasingInFileNames": true // Prevent case-sensitivity issues
   },
   "exclude": [
     "node_modules",
