@@ -25,16 +25,16 @@ export default class LineData {
 			// Special handling for JSX operators and attributes
 			if (operator === '<' || operator === '>' || operator === '/>') {
 				// Treat JSX tags as separate parts
-				const jsxPart = {
-					text: part,
-					length: part.length,
-					width: getPhysicalWidth(part),
-					operator: operator,
-					operatorWidth: getPhysicalWidth(operator),
-					operatorType: 'jsx',
-					decorationLocation: text.length,
-					decoratorChar: decoratorChar,
-				};
+				const jsxPart = new LinePart(
+					part,
+					part.length,
+					getPhysicalWidth(part),
+					operator,
+					getPhysicalWidth(operator),
+					'jsx',
+					text.length,
+					decoratorChar
+				);
 				parts.push(jsxPart);
 				continue;
 			}
@@ -46,7 +46,7 @@ export default class LineData {
 			const operatorType = operatorsGroup[operator];
 			const length = part.length;
 
-			parts.push({
+			const linePart = new LinePart(
 				text,
 				length,
 				width,
@@ -54,8 +54,9 @@ export default class LineData {
 				operatorWidth,
 				operatorType,
 				decorationLocation,
-				decoratorChar,
-			});
+				decoratorChar
+			);
+			parts.push(linePart);
 		}
 
 		// https://github.com/aNickzz/Align-Spaces/issues/13
