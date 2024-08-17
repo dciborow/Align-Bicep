@@ -59,7 +59,7 @@ export default class LineData {
 
 			const linePart: LinePart = {
 				text,
-				length,
+				length: part.length, // Correct reference
 				width,
 				operator,
 				operatorWidth,
@@ -73,31 +73,4 @@ export default class LineData {
 		let prefix = '';
 
 		if (parts.length > 0 && parts[0].operatorType === 'assignment') {
-			const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
-			if (prefixMatch) {
-				prefix = prefixMatch[1];
-			}
-		}
-
-		return new LineData(indentation, prefix, parts);
-	}
-
-	compare(other: LineData) {
-		if (this.indentation !== other.indentation) {
-			return false;
-		}
-		if (this.prefix !== other.prefix) {
-			return false;
-		}
-
-		const lim = Math.min(this.parts.length, other.parts.length);
-
-		for (let i = 0; i < lim; i++) {
-			if (this.parts[i].operatorType !== other.parts[i].operatorType) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
+			const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[
