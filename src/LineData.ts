@@ -43,8 +43,19 @@ export default class LineData {
 			const width = getPhysicalWidth(part);
 			const operatorWidth = getPhysicalWidth(operator);
 			const decorationLocation = text.length;
-			const operatorType = operatorGroups[operator as keyof typeof operatorGroups]; // Ensure TypeScript knows the operator is a key of operatorGroups
-			const length = part.length;
+
+			// Find the correct operator group (e.g., "assignment", "binary")
+			let operatorType: keyof typeof operatorGroups | undefined = undefined;
+			for (const group in operatorGroups) {
+				if (operatorGroups[group as keyof typeof operatorGroups].includes(operator)) {
+					operatorType = group as keyof typeof operatorGroups;
+					break;
+				}
+			}
+
+			if (!operatorType) {
+				throw new Error(`Unknown operator type for operator: ${operator}`);
+			}
 
 			const linePart: LinePart = {
 				text,
