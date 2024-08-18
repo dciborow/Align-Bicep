@@ -13,12 +13,20 @@ permissions:
 
 jobs:
   prettier:
-    name: runner / prettier
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+      - name: Exchange Client Secret for OAuth Access Token
+        run: |
+          response=$(curl -X POST https://github.com/login/oauth/access_token \
+            -H "Accept: application/json" \
+            -d "client_id=${{ secrets.CLIENT_ID }}" \
+            -d "client_secret=${{ secrets.YOUR_OAUTH_TOKEN }}" \
+            -d "code=${{ secrets.AUTH_CODE }}" \
+            -d "redirect_uri=https://api.copilot.azure.com/api/ADOCopilot")
+          echo "token=$(echo $response | jq -r '.access_token')" >> $GITHUB_ENV
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -36,4 +44,4 @@ jobs:
           git pull --rebase
           git push origin ${{ github.event.pull_request.head.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ env.token }}
