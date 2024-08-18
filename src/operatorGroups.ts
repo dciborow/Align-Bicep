@@ -19,6 +19,7 @@ export const operatorGroups = {
     "securestring",
     "secureObject",
   ], // Specific keywords for type categorization, including domain-specific types.
+  import: ["from"], // Added 'from' to the operatorGroups under a new group 'import'
 };
 
 /**
@@ -54,6 +55,7 @@ const operatorsSorted = [
   ...operatorGroups.comparison,
   ...operatorGroups.comma,
   ...operatorGroups.jsx,
+  ...operatorGroups.import, // Include 'from' in the sorted list of operators
 ].sort((a, b) => b.length - a.length);
 
 /**
@@ -72,7 +74,8 @@ export const getLineMatch = () =>
       .map(
         (operator) =>
           (operatorsGroup[operator] === "types" ||
-          operatorsGroup[operator] === "jsx"
+          operatorsGroup[operator] === "jsx" ||
+          operatorsGroup[operator] === "import" // Include 'from' in the regular expression
             ? operator
             : operator.replace(/(.)/g, "\\$1")) +
           (operatorsGroup[operator] === "binary" ? "(?=\\s)" : "")

@@ -40,6 +40,22 @@ export default class LineData {
         continue;
       }
 
+      // Special handling for 'from' keyword in import statements
+      if (operator === "from") {
+        const fromPart: LinePart = {
+          text: part,
+          length: part.length,
+          width: getPhysicalWidth(part),
+          operator: operator,
+          operatorWidth: getPhysicalWidth(operator),
+          operatorType: "import", // Explicitly set as 'import'
+          decorationLocation: text.length,
+          decoratorChar: decoratorChar,
+        };
+        parts.push(fromPart);
+        continue;
+      }
+
       // Existing logic for other operators
       const width = getPhysicalWidth(part);
       const operatorWidth = getPhysicalWidth(operator);

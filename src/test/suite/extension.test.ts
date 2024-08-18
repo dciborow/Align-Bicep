@@ -62,4 +62,35 @@ suite("Bicep Test Suite", () => {
       "JSX should be split into five parts"
     );
   });
+
+  const case6 = "import Sidebar from './components/Sidebar';";
+  const test6 = LineData.fromString(case6);
+  test("Test Import Statements", () => {
+    assert.strictEqual(test6.prefix, "", "Import prefix should be empty");
+    assert.strictEqual(
+      test6.parts.length,
+      2,
+      "Import statement should be split into two parts"
+    );
+    assert.strictEqual(
+      test6.parts[0].text,
+      "import Sidebar ",
+      "First part of import statement should be 'import Sidebar '"
+    );
+    assert.strictEqual(
+      test6.parts[0].operator,
+      "from",
+      "First operator should be 'from'"
+    );
+    assert.strictEqual(
+      test6.parts[0].operatorType,
+      "import",
+      "First operator type should be 'import'"
+    );
+    assert.strictEqual(
+      test6.parts[1].text,
+      " './components/Sidebar';",
+      "Second part of import statement should be ' './components/Sidebar';'"
+    );
+  });
 });
