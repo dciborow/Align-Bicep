@@ -84,7 +84,19 @@ export default class LineData {
       }
     }
 
-    return new LineData(indentation, prefix, parts);
+    const lineData = new LineData(indentation, prefix, parts);
+    lineData.alignParts();
+    return lineData;
+  }
+
+  alignParts() {
+    const maxWidths = this.parts.map((part) => part.width);
+    this.parts.forEach((part, i) => {
+      const offset = maxWidths[i] - part.width;
+      if (offset > 0) {
+        part.text = part.text.padEnd(part.text.length + offset, " ");
+      }
+    });
   }
 
   compare(other: LineData) {
