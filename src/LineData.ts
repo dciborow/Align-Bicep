@@ -19,7 +19,6 @@ export default class LineData {
     for (
       let match: RegExpExecArray | null = null;
       (match = lineMatch.exec(line));
-
     ) {
       const [part, text, decoratorChar, operator] = match;
 
@@ -48,7 +47,7 @@ export default class LineData {
           width: getPhysicalWidth(part),
           operator: operator,
           operatorWidth: getPhysicalWidth(operator),
-          operatorType: "import", // Explicitly set as 'import'
+          operatorType: "importGroup", // Explicitly set as 'importGroup'
           decorationLocation: text.length,
           decoratorChar: decoratorChar,
         };

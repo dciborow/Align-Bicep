@@ -84,8 +84,8 @@ suite("Bicep Test Suite", () => {
     );
     assert.strictEqual(
       test6.parts[0].operatorType,
-      "import",
-      "First operator type should be 'import'"
+      "importGroup",
+      "First operator type should be 'importGroup'"
     );
     assert.strictEqual(
       test6.parts[1].text,
