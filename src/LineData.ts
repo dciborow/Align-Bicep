@@ -15,7 +15,7 @@ export default class LineData {
 
     let match: RegExpExecArray | null = null;
 
-    const indentation = line.match(/^\s*/)?.[0] || ""; // Pf6ab
+    const indentation = line.match(/^\s*/)?.[0] || "";
 
     while ((match = lineMatch.exec(line)) !== null) {
       const [part, text, decoratorChar, operator] = match;
@@ -34,7 +34,7 @@ export default class LineData {
         });
       } else {
         // General case handling
-        const operatorType = this.findOperatorGroup(operator); // P8c8f
+        const operatorType = this.findOperatorGroup(operator);
         if (!operatorType) {
           throw new Error(`Unknown operator type for operator: ${operator}`);
         }
@@ -64,7 +64,7 @@ export default class LineData {
       }
     }
 
-    return new LineData(indentation, prefix, parts); // Pf6ab
+    return new LineData(indentation, prefix, parts);
   }
 
   compare(other: LineData) {
@@ -89,12 +89,11 @@ export default class LineData {
   private static findOperatorGroup(
     operator: string
   ): keyof typeof operatorGroups | undefined {
-    // P8c8f
     return Object.keys(operatorGroups).find(
       (
-        group // P8c8f
+        group
       ) =>
-        operatorGroups[group as keyof typeof operatorGroups].includes(operator) // P8c8f
-    ) as keyof typeof operatorGroups | undefined; // P8c8f
-  } // P8c8f
+        operatorGroups[group as keyof typeof operatorGroups].includes(operator)
+    ) as keyof typeof operatorGroups | undefined;
+  }
 }
