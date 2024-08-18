@@ -86,9 +86,15 @@ export default class LineData {
     return true;
   }
 
-  private static findOperatorGroup(operator: string): keyof typeof operatorGroups | undefined { // P8c8f
-    return Object.keys(operatorGroups).find(group => // P8c8f
-      operatorGroups[group as keyof typeof operatorGroups].includes(operator) // P8c8f
+  private static findOperatorGroup(
+    operator: string
+  ): keyof typeof operatorGroups | undefined {
+    // P8c8f
+    return Object.keys(operatorGroups).find(
+      (
+        group // P8c8f
+      ) =>
+        operatorGroups[group as keyof typeof operatorGroups].includes(operator) // P8c8f
     ) as keyof typeof operatorGroups | undefined; // P8c8f
   } // P8c8f
 }

@@ -87,8 +87,10 @@ export const getLineMatch = () =>
  * @param {string} operator - The operator to find the group for.
  * @returns {keyof typeof operatorGroups | undefined} The operator group, or undefined if not found.
  */
-export function findOperatorGroup(operator: string): keyof typeof operatorGroups | undefined {
-  return Object.keys(operatorGroups).find(group =>
+export function findOperatorGroup(
+  operator: string
+): keyof typeof operatorGroups | undefined {
+  return Object.keys(operatorGroups).find((group) =>
     operatorGroups[group as keyof typeof operatorGroups].includes(operator)
   ) as keyof typeof operatorGroups | undefined;
 }
