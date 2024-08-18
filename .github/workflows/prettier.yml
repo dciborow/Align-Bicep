@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Exchange Client Secret for OAuth Access Token
         run: |
           response=$(curl -X POST https://github.com/login/oauth/access_token \
