@@ -36,4 +36,4 @@ jobs:
           git pull --rebase
           git push --force-with-lease origin ${{ github.event.pull_request.head.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.YOUR_OAUTH_TOKEN }}
