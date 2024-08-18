@@ -34,8 +34,6 @@ export default class LineData {
           operatorWidth: getPhysicalWidth(operator),
           operatorType: "jsx", // Explicitly set as 'jsx'
           decorationLocation: text.length,
-            
-          
           decoratorChar: decoratorChar,
         };
         parts.push(jsxPart);
