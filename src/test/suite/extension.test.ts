@@ -56,10 +56,11 @@ suite("Bicep Test Suite", () => {
   const test5 = LineData.fromString(case5);
   test("Test JSX Attributes", () => {
     assert.strictEqual(test5.prefix, "", "JSX prefix should be empty");
-    assert.strictEqual(
-      test5.parts.length,
-      5,
-      "JSX should be split into five parts"
-    );
+    assert.strictEqual(test5.parts.length, 5, "JSX should be split into five parts");
+    assert.strictEqual(test5.parts[0].text, "<Route ", "First part should be '<Route '");
+    assert.strictEqual(test5.parts[1].text, 'path="/" ', "Second part should be 'path=\"/\" '");
+    assert.strictEqual(test5.parts[2].text, "element={", "Third part should be 'element={'");
+    assert.strictEqual(test5.parts[3].text, "<HomePage ", "Fourth part should be '<HomePage '");
+    assert.strictEqual(test5.parts[4].text, "/>} />", "Fifth part should be '/>} />'");
   });
 });
