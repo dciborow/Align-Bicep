@@ -9,15 +9,15 @@ export default class LineData {
     public parts: LinePart[]
   ) {}
 
- static fromString(line: string) {
+  static fromString(line: string) {
     const lineMatch = getLineMatch();
     const parts: LinePart[] = [];
-    
+
     let match: RegExpExecArray | null = null;
-    
+
     while ((match = lineMatch.exec(line)) !== null) {
       const [part, text, decoratorChar, operator] = match;
-  
+
       if (operator === "<" || operator === ">" || operator === "/>") {
         // JSX tag handling
         parts.push({
@@ -36,7 +36,7 @@ export default class LineData {
         if (!operatorType) {
           throw new Error(`Unknown operator type for operator: ${operator}`);
         }
-        
+
         parts.push({
           text: text,
           length: part.length,
@@ -49,10 +49,10 @@ export default class LineData {
         });
       }
     }
-  
+
     // Add additional logic here to split attributes and embedded JSX expressions
     // if necessary, particularly for cases like `path="/"` or `{<HomePage />}`.
-  
+
     // Determine the prefix (if any) for object properties
     let prefix = "";
     if (parts.length > 0 && parts[0].operatorType === "assignment") {
@@ -61,10 +61,9 @@ export default class LineData {
         prefix = prefixMatch[1];
       }
     }
-  
+
     return new LineData(indentation, prefix, parts);
   }
-
 
   compare(other: LineData) {
     if (this.indentation !== other.indentation) {
