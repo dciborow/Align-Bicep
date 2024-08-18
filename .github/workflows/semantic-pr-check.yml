@@ -17,7 +17,6 @@ jobs:
       - uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    if: ${{ failure() }}  # Allow the Auto PR Prefix job to run only if this job fails
 
   auto-pr-prefix:
     name: Auto PR Prefix
@@ -32,19 +31,22 @@ jobs:
       - name: Fetch PR diff
         id: fetch_pr_diff
         run: |
-          # Fetch the diff for the current pull request
+          echo "::group::Fetching PR Diff"
           pr_diff=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3.diff" \
             https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}.diff)
+          echo "::endgroup::"
           
-          # Save the diff to an output variable
-          echo "::set-output name=pr_diff::$pr_diff"
+          # Save the diff to an environment file (updated syntax for GitHub Actions)
+          echo "pr_diff<<EOF" >> $GITHUB_ENV
+          echo "$pr_diff" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Call Azure OpenAI to get PR prefix
         id: call_openai
         run: |
-          pr_diff="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
-
+          pr_diff="${{ env.pr_diff }}"
+          echo "::group::Constructing and Sending Prompt to OpenAI"
           # Construct the prompt JSON
           prompt=$(cat <<EOF
           {
@@ -52,21 +54,21 @@ jobs:
           }
           EOF
           )
-
           # Make the API request
           curl -X POST "${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.AZURE_OPENAI_API_KEY }}" \
             -d "$prompt" \
             -o response.json
+          echo "::endgroup::"
 
           # Extract the PR prefix from the response
           pr_prefix=$(jq -r .choices[0].text < response.json)
-          echo "::set-output name=pr_prefix::$pr_prefix"
+          echo "pr_prefix=$pr_prefix" >> $GITHUB_ENV
 
       - name: Update PR title with prefix
         run: |
-          gh pr edit ${{ github.event.pull_request.number }} --title "${{ steps.call_openai.outputs.pr_prefix }}: ${{ steps.fetch_pr_title.outputs.pr_title }}"
+          gh pr edit ${{ github.event.pull_request.number }} --title "${{ env.pr_prefix }}: ${{ steps.fetch_pr_title.outputs.pr_title }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
