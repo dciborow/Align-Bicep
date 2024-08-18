@@ -1,6 +1,7 @@
 import * as assert from "assert";
 
 import LineData from "../../LineData";
+import { getPhysicalWidth } from "../../extension";
 
 suite("Bicep Test Suite", () => {
   const case1 = "param isZoneRedundant bool = false";
@@ -126,20 +127,19 @@ suite("Bicep Test Suite", () => {
     );
   });
 
-  // New test case for createFromPart method
+  // New test case for createLinePart method
   const part = "import Sidebar ";
-  const text = "import Sidebar ";
   const operator = "from";
   const decoratorChar = " ";
-  const fromPart = LineData.createFromPart(part, text, operator, decoratorChar);
-  test("Test createFromPart Method", () => {
+  const fromPart = LineData.createLinePart(part, operator, "importGroup", decoratorChar);
+  test("Test createLinePart Method", () => {
     assert.strictEqual(fromPart.text, part, "Text should match the part");
     assert.strictEqual(fromPart.length, part.length, "Length should match the part length");
     assert.strictEqual(fromPart.width, getPhysicalWidth(part), "Width should match the physical width of the part");
     assert.strictEqual(fromPart.operator, operator, "Operator should match the provided operator");
     assert.strictEqual(fromPart.operatorWidth, getPhysicalWidth(operator), "Operator width should match the physical width of the operator");
     assert.strictEqual(fromPart.operatorType, "importGroup", "Operator type should be 'importGroup'");
-    assert.strictEqual(fromPart.decorationLocation, text.length, "Decoration location should match the text length");
+    assert.strictEqual(fromPart.decorationLocation, part.length, "Decoration location should match the part length");
     assert.strictEqual(fromPart.decoratorChar, decoratorChar, "Decorator char should match the provided decorator char");
   });
 });

@@ -24,24 +24,14 @@ export default class LineData {
 
       // Special handling for JSX operators and attributes
       if (operator === "<" || operator === ">" || operator === "/>") {
-        // Treat JSX tags as separate parts
-        const jsxPart: LinePart = {
-          text: part,
-          length: part.length,
-          width: getPhysicalWidth(part),
-          operator: operator,
-          operatorWidth: getPhysicalWidth(operator),
-          operatorType: "jsx", // Explicitly set as 'jsx'
-          decorationLocation: text.length,
-          decoratorChar: decoratorChar,
-        };
+        const jsxPart = LineData.createLinePart(part, operator, "jsx", decoratorChar);
         parts.push(jsxPart);
         continue;
       }
 
       // Special handling for 'from' keyword in import statements
       if (operator === "from") {
-        const fromPart = LineData.createFromPart(part, text, operator, decoratorChar);
+        const fromPart = LineData.createLinePart(part, operator, "importGroup", decoratorChar);
         parts.push(fromPart);
         continue;
       }
@@ -93,15 +83,15 @@ export default class LineData {
     return new LineData(indentation, prefix, parts);
   }
 
-  static createFromPart(part: string, text: string, operator: string, decoratorChar: string): LinePart {
+  static createLinePart(part: string, operator: string, operatorType: keyof typeof operatorGroups, decoratorChar: string): LinePart {
     return {
       text: part,
       length: part.length,
       width: getPhysicalWidth(part),
       operator: operator,
       operatorWidth: getPhysicalWidth(operator),
-      operatorType: "importGroup", // Explicitly set as 'importGroup'
-      decorationLocation: text.length,
+      operatorType: operatorType,
+      decorationLocation: part.length,
       decoratorChar: decoratorChar,
     };
   }
