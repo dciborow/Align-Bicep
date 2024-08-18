@@ -1,4 +1,4 @@
-name: "Semantic PR Check"
+name: "PR Validation and Auto-Fix"
 
 on:
   pull_request_target:
@@ -11,6 +11,67 @@ jobs:
   main:
     name: Validate PR title
     runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Allow the Auto PR Prefix job to run only if this job fails
+    if: ${{ failure() }}
+
+  auto-pr-prefix:
+    name: Auto PR Prefix
+    needs: main  # This ensures the job only runs after the "main" job
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}  # Run only if the "main" job fails
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch PR title
+        id: fetch_pr_title
+        run: echo "::set-output name=pr_title::$(jq -r .pull_request.title < $GITHUB_EVENT_PATH)"
+
+      - name: Fetch PR diff
+        id: fetch_pr_diff
+        run: echo "::set-output name=pr_diff::$(jq -r .pull_request.diff_url < $GITHUB_EVENT_PATH)"
+
+      - name: Call Azure OpenAI to get PR prefix
+        id: call_openai
+        run: |
+          diff_url="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
+
+          # Construct the prompt JSON
+          prompt=$(cat <<EOF
+          {
+            "prompt": "Determine the PR prefix for the following diff: $diff_url\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"
+          }
+          EOF
+          )
+
+          # Make the API request
+          curl -X POST "${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.AZURE_OPENAI_API_KEY }}" \
+            -d "$prompt" \
+            -o response.json
+
+          # Extract the PR prefix from the response
+          pr_prefix=$(jq -r .choices[0].text < response.json)
+          echo "::set-output name=pr_prefix::$pr_prefix"
+
+      - name: Update PR title with prefix
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --title "${{ steps.call_openai.outputs.pr_prefix }}: ${{ steps.fetch_pr_title.outputs.pr_title }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  rerun-main:
+    name: Revalidate PR title
+    needs: auto-pr-prefix  # This ensures the job only runs after "auto-pr-prefix" job
+    runs-on: ubuntu-latest
+    if: ${{ success() }}  # Run only if "auto-pr-prefix" was successful
+
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
