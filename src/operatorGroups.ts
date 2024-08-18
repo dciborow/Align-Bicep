@@ -1,6 +1,6 @@
 /**
- * Groups various operators by their purpose. These groups facilitate operations 
- * such as validation, sorting, and regular expression construction. The grouping 
+ * Groups various operators by their purpose. These groups facilitate operations
+ * such as validation, sorting, and regular expression construction. The grouping
  * ensures operators are categorized logically for different use cases.
  */
 export const operatorGroups = {
@@ -22,7 +22,7 @@ export const operatorGroups = {
 };
 
 /**
- * Maps each operator to its corresponding group to allow for fast lookup. 
+ * Maps each operator to its corresponding group to allow for fast lookup.
  * This is used when categorizing operators for validation or processing purposes.
  */
 export const operatorsGroup: {
@@ -30,8 +30,8 @@ export const operatorsGroup: {
 } = {};
 
 /**
- * Populates the operatorsGroup map by iterating through operatorGroups. This 
- * ensures that any future updates to operatorGroups are automatically reflected 
+ * Populates the operatorsGroup map by iterating through operatorGroups. This
+ * ensures that any future updates to operatorGroups are automatically reflected
  * in operatorsGroup without additional maintenance.
  */
 (Object.keys(operatorGroups) as (keyof typeof operatorGroups)[]).forEach(
@@ -43,8 +43,8 @@ export const operatorsGroup: {
 );
 
 /**
- * Sorts operators by length in descending order. This is critical when generating 
- * regular expressions, as longer operators need to be matched first to prevent 
+ * Sorts operators by length in descending order. This is critical when generating
+ * regular expressions, as longer operators need to be matched first to prevent
  * shorter operators from matching prematurely (e.g., matching "=" before "===").
  */
 const operatorsSorted = [
@@ -57,13 +57,13 @@ const operatorsSorted = [
 ].sort((a, b) => b.length - a.length);
 
 /**
- * Constructs a regular expression that matches any line containing an operator 
- * from the sorted list of operators. This function applies specific handling 
- * to certain categories of operators: JSX and type operators are used directly, 
- * while other operators are escaped for safety. Binary operators are matched 
+ * Constructs a regular expression that matches any line containing an operator
+ * from the sorted list of operators. This function applies specific handling
+ * to certain categories of operators: JSX and type operators are used directly,
+ * while other operators are escaped for safety. Binary operators are matched
  * only if followed by whitespace to avoid conflicts with similar operators.
- * 
- * @returns {RegExp} A regular expression for matching lines that contain 
+ *
+ * @returns {RegExp} A regular expression for matching lines that contain
  * any of the operators.
  */
 export const getLineMatch = () =>
