@@ -28,12 +28,17 @@ jobs:
       - name: Call Azure OpenAI to get PR prefix
         id: call_openai
         run: |
-          curl -X POST "$AZURE_OPENAI_ENDPOINT" \
+          diff_url="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
+          prompt=$(jq -n --arg diff "$diff_url" '{"prompt": "Determine the PR prefix for the following diff: \($diff)\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"}')
+          
+          curl -X POST "https://gpt-review.openai.azure.com/" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer $AZURE_OPENAI_API_KEY" \
-          -d "{\"prompt\": \"Determine the PR prefix for the following diff: $(echo ${{ steps.fetch_pr_diff.outputs.pr_diff }})\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit\"}" \
+          -H "Authorization: Bearer ${{ secrets.AZURE_OPENAI_API_KEY }}" \
+          -d "$prompt" \
           -o response.json
-          echo "::set-output name=pr_prefix::$(jq -r .choices[0].text < response.json)"
+          
+          pr_prefix=$(jq -r .choices[0].text < response.json)
+          echo "::set-output name=pr_prefix::$pr_prefix"
 
       - name: Update PR title with prefix
         run: |
