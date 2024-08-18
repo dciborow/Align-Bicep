@@ -1,6 +1,6 @@
 {
   "name": "align-bicep",
-  "version": "0.3.7",
+  "version": "0.3.6",
   "displayName": "Align Bicep",
   "publisher": "microsoft-dciborow",
   "description": "Align Bicep files without modifying the code",
@@ -76,7 +76,7 @@
             }
           ],
           "default": 0,
-          "description": "If set to a number, this defines the number of milliseconds to wait before realigning. <=0 means no delay.\n\nIf set to `\"off\"`, automatic realignment is prevented and you must run the `align-https://github.com/dciborow/Align-Bicep.realign` command."
+          "description": "If set to a number, this defines the number of milliseconds to wait before realigning. <=0 means no delay.\n\nIf set to `\"off\"`, automatic realignment is prevented and you must run the `align-bicep.realign` command."
         }
       }
     },
@@ -100,7 +100,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./dist/test/runTest.js",
+    "test": "mocha --recursive ./out/test --timeout 10000",
+    "test:ci": "mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results.xml",
     "format": "prettier --write ."
   },
   "devDependencies": {
@@ -113,10 +114,9 @@
     "eslint": "^7.26.0",
     "glob": "^7.1.6",
     "mocha": "^10.7.3",
+    "mocha-junit-reporter": "^2.0.0",
     "typescript": "^4.1.3",
-    "vscode-test": "^1.5.0"
-  },
-  "dependencies": {
+    "vscode-test": "^1.5.0",
     "prettier": "^2.8.1"
   }
 }
