@@ -16,6 +16,8 @@ export default class LineData {
     const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
     const parts: LinePart[] = [];
 
+    const importKeywords = ['from', 'import', 'as'];
+
     for (
       let match: RegExpExecArray | null = null;
       (match = lineMatch.exec(line));
@@ -29,10 +31,10 @@ export default class LineData {
         continue;
       }
 
-      // Special handling for 'from' keyword in import statements
-      if (operator === "from") {
-        const fromPart = LineData.createLinePart(part, operator, "importGroup", decoratorChar);
-        parts.push(fromPart);
+      // Generalized handling for import-related keywords
+      if (importKeywords.includes(operator)) {
+        const importPart = LineData.createLinePart(part, operator, "importGroup", decoratorChar);
+        parts.push(importPart);
         continue;
       }
 
