@@ -2,10 +2,6 @@ name: "PR Validation and Auto-Fix"
 
 on:
   pull_request_target:
-    types:
-      - opened
-      - edited
-      - synchronize
 
 jobs:
   main:
