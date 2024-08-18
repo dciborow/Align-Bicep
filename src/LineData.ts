@@ -16,27 +16,25 @@ export default class LineData {
     const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
     const parts: LinePart[] = [];
 
+    const importKeywords = ['from', 'import', 'as'];
+
     for (
       let match: RegExpExecArray | null = null;
       (match = lineMatch.exec(line));
-
     ) {
       const [part, text, decoratorChar, operator] = match;
 
       // Special handling for JSX operators and attributes
       if (operator === "<" || operator === ">" || operator === "/>") {
-        // Treat JSX tags as separate parts
-        const jsxPart: LinePart = {
-          text: part,
-          length: part.length,
-          width: getPhysicalWidth(part),
-          operator: operator,
-          operatorWidth: getPhysicalWidth(operator),
-          operatorType: "jsx", // Explicitly set as 'jsx'
-          decorationLocation: text.length,
-          decoratorChar: decoratorChar,
-        };
+        const jsxPart = LineData.createLinePart(part, operator, "jsx", decoratorChar);
         parts.push(jsxPart);
+        continue;
+      }
+
+      // Generalized handling for import-related keywords
+      if (importKeywords.includes(operator)) {
+        const importPart = LineData.createLinePart(part, operator, "importGroup", decoratorChar);
+        parts.push(importPart);
         continue;
       }
 
@@ -85,6 +83,19 @@ export default class LineData {
     }
 
     return new LineData(indentation, prefix, parts);
+  }
+
+  static createLinePart(part: string, operator: string, operatorType: keyof typeof operatorGroups, decoratorChar: string): LinePart {
+    return {
+      text: part,
+      length: part.length,
+      width: getPhysicalWidth(part),
+      operator: operator,
+      operatorWidth: getPhysicalWidth(operator),
+      operatorType: operatorType,
+      decorationLocation: part.length,
+      decoratorChar: decoratorChar,
+    };
   }
 
   compare(other: LineData) {
