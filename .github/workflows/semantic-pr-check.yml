@@ -37,22 +37,18 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}.diff)
           echo "::endgroup::"
           
-          # Save the diff to an environment file (updated syntax for GitHub Actions)
-          echo "pr_diff<<EOF" >> $GITHUB_ENV
-          echo "$pr_diff" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Save the diff to an environment file without using a here-document
+          echo "pr_diff=$pr_diff" >> $GITHUB_ENV
 
       - name: Call Azure OpenAI to get PR prefix
         id: call_openai
         run: |
           pr_diff="${{ env.pr_diff }}"
           echo "::group::Constructing and Sending Prompt to OpenAI"
-          # Construct the prompt JSON using single quotes to avoid issues with nested quotes
-          prompt=$(
-          jq -n --arg diff "$pr_diff" '{
+          # Construct the prompt JSON using jq safely
+          prompt=$(jq -n --arg diff "$pr_diff" '{
             "prompt": "Determine the PR prefix for the following diff: \($diff)\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"
-          }'
-          )
+          }')
           # Make the API request
           curl -X POST "${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
             -H "Content-Type: application/json" \
@@ -60,7 +56,6 @@ jobs:
             -d "$prompt" \
             -o response.json
           echo "::endgroup::"
-
           # Extract the PR prefix from the response
           pr_prefix=$(jq -r .choices[0].text < response.json)
           echo "pr_prefix=$pr_prefix" >> $GITHUB_ENV
