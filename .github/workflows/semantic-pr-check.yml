@@ -1,7 +1,7 @@
 name: "PR Validation and Auto-Fix"
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - edited
@@ -15,12 +15,11 @@ jobs:
       - uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # Allow the Auto PR Prefix job to run only if this job fails
-    if: ${{ failure() }}
+    if: ${{ failure() }}  # Allow the Auto PR Prefix job to run only if this job fails
 
   auto-pr-prefix:
     name: Auto PR Prefix
-    needs: main  # This ensures the job only runs after the "main" job
+    needs: main
     runs-on: ubuntu-latest
     if: ${{ failure() }}  # Run only if the "main" job fails
 
@@ -28,23 +27,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch PR title
-        id: fetch_pr_title
-        run: echo "::set-output name=pr_title::$(jq -r .pull_request.title < $GITHUB_EVENT_PATH)"
-
       - name: Fetch PR diff
         id: fetch_pr_diff
-        run: echo "::set-output name=pr_diff::$(jq -r .pull_request.diff_url < $GITHUB_EVENT_PATH)"
+        run: |
+          # Fetch the diff for the current pull request
+          pr_diff=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3.diff" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}.diff)
+          
+          # Save the diff to an output variable
+          echo "::set-output name=pr_diff::$pr_diff"
 
       - name: Call Azure OpenAI to get PR prefix
         id: call_openai
         run: |
-          diff_url="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
+          pr_diff="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
 
           # Construct the prompt JSON
           prompt=$(cat <<EOF
           {
-            "prompt": "Determine the PR prefix for the following diff: $diff_url\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"
+            "prompt": "Determine the PR prefix for the following diff: $pr_diff\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"
           }
           EOF
           )
@@ -68,7 +70,7 @@ jobs:
 
   rerun-main:
     name: Revalidate PR title
-    needs: auto-pr-prefix  # This ensures the job only runs after "auto-pr-prefix" job
+    needs: auto-pr-prefix
     runs-on: ubuntu-latest
     if: ${{ success() }}  # Run only if "auto-pr-prefix" was successful
 
