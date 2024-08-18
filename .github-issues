@@ -1,0 +1,52 @@
+[
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$repo=repo:aNickzz/Align-Spaces\n$issues=$repo is:issue is:open\n$prs=$repo is:pr is:open"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## My Issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$issues assignee:@me"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## New issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$issues no:milestone"
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## All issues"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$issues -label:\"interest needed\""
+  },
+  {
+    "kind": 1,
+    "language": "markdown",
+    "value": "## Pull Requests"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": "$prs"
+  },
+  {
+    "kind": 2,
+    "language": "github-issues",
+    "value": ""
+  }
+]
