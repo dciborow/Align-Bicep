@@ -22,7 +22,8 @@ jobs:
             -H "Accept: application/json" \
             -d "client_id=${{ secrets.CLIENT_ID }}" \
             -d "client_secret=${{ secrets.YOUR_OAUTH_TOKEN }}" \
-            -d "code=${{ secrets.AUTH_CODE }}")
+            -d "code=${{ secrets.AUTH_CODE }}" \
+            -d "redirect_uri=https://api.copilot.azure.com/api/ADOCopilot")
           echo "token=$(echo $response | jq -r '.access_token')" >> $GITHUB_ENV
       - name: Set up Node.js
         uses: actions/setup-node@v4
