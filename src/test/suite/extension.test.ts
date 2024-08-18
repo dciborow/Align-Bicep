@@ -93,4 +93,53 @@ suite("Bicep Test Suite", () => {
       "Second part of import statement should be ' './components/Sidebar';'"
     );
   });
+
+  // New test case for import statements with multiple parts
+  const case7 = "import { Sidebar, Header } from './components';";
+  const test7 = LineData.fromString(case7);
+  test("Test Import Statements with Multiple Parts", () => {
+    assert.strictEqual(test7.prefix, "", "Import prefix should be empty");
+    assert.strictEqual(
+      test7.parts.length,
+      2,
+      "Import statement should be split into two parts"
+    );
+    assert.strictEqual(
+      test7.parts[0].text,
+      "import { Sidebar, Header } ",
+      "First part of import statement should be 'import { Sidebar, Header } '"
+    );
+    assert.strictEqual(
+      test7.parts[0].operator,
+      "from",
+      "First operator should be 'from'"
+    );
+    assert.strictEqual(
+      test7.parts[0].operatorType,
+      "importGroup",
+      "First operator type should be 'importGroup'"
+    );
+    assert.strictEqual(
+      test7.parts[1].text,
+      " './components';",
+      "Second part of import statement should be ' './components';'"
+    );
+  });
+
+  // New test case for createFromPart method
+  const part = "import Sidebar ";
+  const text = "import Sidebar ";
+  const operator = "from";
+  const decoratorChar = " ";
+  const fromPart = LineData.createFromPart(part, text, operator, decoratorChar);
+  test("Test createFromPart Method", () => {
+    assert.strictEqual(fromPart.text, part, "Text should match the part");
+    assert.strictEqual(fromPart.length, part.length, "Length should match the part length");
+    assert.strictEqual(fromPart.width, getPhysicalWidth(part), "Width should match the physical width of the part");
+    assert.strictEqual(fromPart.operator, operator, "Operator should match the provided operator");
+    assert.strictEqual(fromPart.operatorWidth, getPhysicalWidth(operator), "Operator width should match the physical width of the operator");
+    assert.strictEqual(fromPart.operatorType, "importGroup", "Operator type should be 'importGroup'");
+    assert.strictEqual(fromPart.decorationLocation, text.length, "Decoration location should match the text length");
+    assert.strictEqual(fromPart.decoratorChar, decoratorChar, "Decorator char should match the provided decorator char");
+  });
 });

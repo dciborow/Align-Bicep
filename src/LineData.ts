@@ -41,16 +41,7 @@ export default class LineData {
 
       // Special handling for 'from' keyword in import statements
       if (operator === "from") {
-        const fromPart: LinePart = {
-          text: part,
-          length: part.length,
-          width: getPhysicalWidth(part),
-          operator: operator,
-          operatorWidth: getPhysicalWidth(operator),
-          operatorType: "importGroup", // Explicitly set as 'importGroup'
-          decorationLocation: text.length,
-          decoratorChar: decoratorChar,
-        };
+        const fromPart = LineData.createFromPart(part, text, operator, decoratorChar);
         parts.push(fromPart);
         continue;
       }
@@ -100,6 +91,19 @@ export default class LineData {
     }
 
     return new LineData(indentation, prefix, parts);
+  }
+
+  static createFromPart(part: string, text: string, operator: string, decoratorChar: string): LinePart {
+    return {
+      text: part,
+      length: part.length,
+      width: getPhysicalWidth(part),
+      operator: operator,
+      operatorWidth: getPhysicalWidth(operator),
+      operatorType: "importGroup", // Explicitly set as 'importGroup'
+      decorationLocation: text.length,
+      decoratorChar: decoratorChar,
+    };
   }
 
   compare(other: LineData) {
