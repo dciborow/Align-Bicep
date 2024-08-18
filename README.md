@@ -78,6 +78,22 @@ output blobStorageConnectionString string = blobStorageConnectionString
 This works by adjusting the width of the character.
 The source file is not changed, nor are extra characters shown in the browser (so auto-format will not try to undo the formatting).
 
+## New GitHub Action for PR Title Modification
+
+We have added a new GitHub action that uses Azure OpenAI to automatically add the appropriate PR prefix to pull request titles. This ensures that all PRs follow the required naming conventions.
+
+### Configuration
+
+To configure the Azure OpenAI credentials, follow these steps:
+
+1. Go to your repository on GitHub.
+2. Click on `Settings`.
+3. In the left sidebar, click on `Secrets and variables` and then `Actions`.
+4. Click on `New repository secret`.
+5. Add the following secrets:
+   - `AZURE_OPENAI_ENDPOINT`: Your Azure OpenAI endpoint.
+   - `AZURE_OPENAI_API_KEY`: Your Azure OpenAI API key.
+
 ## Known Issues
 
 - Rectangular selections are borked
