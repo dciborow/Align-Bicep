@@ -142,4 +142,20 @@ suite("Bicep Test Suite", () => {
     assert.strictEqual(fromPart.decorationLocation, part.length, "Decoration location should match the part length");
     assert.strictEqual(fromPart.decoratorChar, decoratorChar, "Decorator char should match the provided decorator char");
   });
+
+  // Diverse test cases for import statements
+  test("Test Diverse Import Statements", () => {
+    const cases = [
+      { input: "import Sidebar from './components/Sidebar';", parts: 2 },
+      { input: "import { useState, useEffect } from 'react';", parts: 2 },
+      { input: "import DefaultExport, { NamedExport } from 'module';", parts: 2 },
+      { input: "import * as React from 'react';", parts: 2 },
+    ];
+
+    cases.forEach(({ input, parts }) => {
+      const testCase = LineData.fromString(input);
+      assert.strictEqual(testCase.prefix, "", "Import prefix should be empty");
+      assert.strictEqual(testCase.parts.length, parts, `Import statement should be split into ${parts} parts`);
+    });
+  });
 });
