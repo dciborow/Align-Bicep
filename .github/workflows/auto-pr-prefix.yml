@@ -31,9 +31,9 @@ jobs:
           diff_url="${{ steps.fetch_pr_diff.outputs.pr_diff }}"
           prompt=$(jq -n --arg diff "$diff_url" '{"prompt": "Determine the PR prefix for the following diff: \($diff)\n\nAvailable types:\n- feat: A new feature\n- fix: A bug fix\n- docs: Documentation only changes\n- style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)\n- refactor: A code change that neither fixes a bug nor adds a feature\n- perf: A code change that improves performance\n- test: Adding missing tests or correcting existing tests\n- build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)\n- ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)\n- chore: Other changes that don't modify src or test files\n- revert: Reverts a previous commit"}')
           
-          curl -X POST "$AZURE_OPENAI_ENDPOINT" \
+          curl -X POST "${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer $AZURE_OPENAI_API_KEY" \
+          -H "Authorization: Bearer ${{ secrets.AZURE_OPENAI_API_KEY }}" \
           -d "$prompt" \
           -o response.json
           
