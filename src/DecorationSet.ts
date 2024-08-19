@@ -5,15 +5,19 @@ export default class DecorationSet {
   decorations: vscode.Range[][] = [];
 
   combine(other: DecorationSet) {
-    other.decorations.forEach((ranges, index) =>
-      (this.decorations[index] ??= []).push(...ranges)
-    );
+    other.decorations.forEach((ranges, index) => {
+      if (!this.decorations[index]) {
+        this.decorations[index] = [];
+      }
+      this.decorations[index].push(...ranges);
+    });
     return this;
   }
 
   apply(editor: vscode.TextEditor) {
     this.decorations.forEach((ranges, i) => {
-      editor.setDecorations(decorationTypes.getForWidth(i), ranges);
+      const decorationType = decorationTypes.getForWidth(i);
+      editor.setDecorations(decorationType, ranges);
     });
   }
 }
