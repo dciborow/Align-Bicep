@@ -24,7 +24,7 @@ export default class LineData {
     return /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
   }
 
-  static extractParts(line: string, lineMatch: RegExp): LinePart[] {
+  private static extractParts(line: string, lineMatch: RegExp): LinePart[] {
     const parts: LinePart[] = [];
 
     for (let match: RegExpExecArray | null = null; (match = lineMatch.exec(line)); ) {
@@ -41,11 +41,11 @@ export default class LineData {
     return parts;
   }
 
-  static isJSXOperator(operator: string): boolean {
+  private static isJSXOperator(operator: string): boolean {
     return operator === "<" || operator === ">" || operator === "/>";
   }
 
-  static createJSXPart(part: string, text: string, operator: string, decoratorChar: string): LinePart {
+  private static createJSXPart(part: string, text: string, operator: string, decoratorChar: string): LinePart {
     return {
       text: part,
       length: part.length,
