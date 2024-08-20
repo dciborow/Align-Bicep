@@ -36,7 +36,7 @@
     "configuration": {
       "title": "Align Spaces",
       "properties": {
-        "align-bicep.allowed-language-ids": {
+        "align-bicep.bicep.allowed-language-ids": {
           "anyOf": [
             {
               "type": "array",
@@ -51,7 +51,7 @@
           "default": null,
           "description": "If set to an array, only activate for the given languages."
         },
-        "align-bicep.disallowed-language-ids": {
+        "align-bicep.bicep.disallowed-language-ids": {
           "anyOf": [
             {
               "type": "array",

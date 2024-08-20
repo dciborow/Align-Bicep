@@ -19,6 +19,12 @@ export const operatorGroups = {
     "securestring",
     "secureObject",
   ], // Specific keywords for type categorization, including domain-specific types.
+  bicep: [
+    "param",
+    "var",
+    "resource",
+    "output",
+  ], // Bicep-specific keywords
 };
 
 /**
@@ -54,6 +60,7 @@ const operatorsSorted = [
   ...operatorGroups.comparison,
   ...operatorGroups.comma,
   ...operatorGroups.jsx,
+  ...operatorGroups.bicep,
 ].sort((a, b) => b.length - a.length);
 
 /**
@@ -72,7 +79,8 @@ export const getLineMatch = () =>
       .map(
         (operator) =>
           (operatorsGroup[operator] === "types" ||
-          operatorsGroup[operator] === "jsx"
+          operatorsGroup[operator] === "jsx" ||
+          operatorsGroup[operator] === "bicep"
             ? operator
             : operator.replace(/(.)/g, "\\$1")) +
           (operatorsGroup[operator] === "binary" ? "(?=\\s)" : "")
