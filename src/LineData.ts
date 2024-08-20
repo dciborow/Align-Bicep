@@ -11,72 +11,52 @@ export default class LineData {
 
   static fromString(line: string) {
     const lineMatch = getLineMatch();
-
-    // TODO: including comments as "indentation" is hardcoded here. It should be configurable per language
-    const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
     const parts: LinePart[] = [];
 
-    for (
-      let match: RegExpExecArray | null = null;
-      (match = lineMatch.exec(line));
+    let match: RegExpExecArray | null = null;
 
-    ) {
+    const indentation = line.match(/^\s*/)?.[0] || "";
+
+    while ((match = lineMatch.exec(line)) !== null) {
       const [part, text, decoratorChar, operator] = match;
 
-      // Special handling for JSX operators and attributes
       if (operator === "<" || operator === ">" || operator === "/>") {
-        // Treat JSX tags as separate parts
-        const jsxPart: LinePart = {
+        // JSX tag handling
+        parts.push({
           text: part,
           length: part.length,
           width: getPhysicalWidth(part),
           operator: operator,
           operatorWidth: getPhysicalWidth(operator),
-          operatorType: "jsx", // Explicitly set as 'jsx'
+          operatorType: "jsx",
           decorationLocation: text.length,
           decoratorChar: decoratorChar,
-        };
-        parts.push(jsxPart);
-        continue;
-      }
-
-      // Existing logic for other operators
-      const width = getPhysicalWidth(part);
-      const operatorWidth = getPhysicalWidth(operator);
-      const decorationLocation = text.length;
-
-      // Find the correct operator group (e.g., "assignment", "binary")
-      let operatorType: keyof typeof operatorGroups | undefined = undefined;
-      for (const group in operatorGroups) {
-        if (
-          operatorGroups[group as keyof typeof operatorGroups].includes(
-            operator
-          )
-        ) {
-          operatorType = group as keyof typeof operatorGroups;
-          break;
+        });
+      } else {
+        // General case handling
+        const operatorType = this.findOperatorGroup(operator);
+        if (!operatorType) {
+          throw new Error(`Unknown operator type for operator: ${operator}`);
         }
-      }
 
-      if (!operatorType) {
-        throw new Error(`Unknown operator type for operator: ${operator}`);
+        parts.push({
+          text: text,
+          length: part.length,
+          width: getPhysicalWidth(part),
+          operator: operator,
+          operatorWidth: getPhysicalWidth(operator),
+          operatorType,
+          decorationLocation: text.length,
+          decoratorChar,
+        });
       }
-
-      const linePart: LinePart = {
-        text,
-        length: part.length, // Correct reference
-        width,
-        operator,
-        operatorWidth,
-        operatorType: operatorType as keyof typeof operatorGroups, // Explicitly cast as valid operatorType
-        decorationLocation,
-        decoratorChar,
-      };
-      parts.push(linePart);
     }
 
-    let prefix = "";
+    // Add additional logic here to split attributes and embedded JSX expressions
+    // if necessary, particularly for cases like `path="/"` or `{<HomePage />}`.
 
+    // Determine the prefix (if any) for object properties
+    let prefix = "";
     if (parts.length > 0 && parts[0].operatorType === "assignment") {
       const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
       if (prefixMatch) {
@@ -104,5 +84,13 @@ export default class LineData {
     }
 
     return true;
+  }
+
+  private static findOperatorGroup(
+    operator: string
+  ): keyof typeof operatorGroups | undefined {
+    return Object.keys(operatorGroups).find((group) =>
+      operatorGroups[group as keyof typeof operatorGroups].includes(operator)
+    ) as keyof typeof operatorGroups | undefined;
   }
 }
