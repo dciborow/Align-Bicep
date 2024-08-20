@@ -95,13 +95,13 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile", // Prepublish script to compile the extension
-    "compile": "tsc -p ./", // Compile TypeScript files
-    "watch": "tsc -watch -p ./", // Watch for changes and compile
-    "pretest": "yarn run compile && yarn run lint", // Pre-test script to compile and lint
-    "lint": "eslint src --ext ts", // Lint TypeScript files
-    "test": "node ./dist/test/runTest.js", // Run tests
-    "format": "prettier --write ." // Format code with Prettier
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./dist/test/runTest.js",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
