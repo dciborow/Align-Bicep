@@ -87,6 +87,64 @@ export default class LineData {
     return new LineData(indentation, prefix, parts);
   }
 
+  static fromBicepString(line: string) {
+    const lineMatch = getLineMatch();
+
+    const indentation = /^\s*(?:(?:\/\/|\*)\s*)?/.exec(line)![0];
+    const parts: LinePart[] = [];
+
+    for (
+      let match: RegExpExecArray | null = null;
+      (match = lineMatch.exec(line));
+
+    ) {
+      const [part, text, decoratorChar, operator] = match;
+
+      const width = getPhysicalWidth(part);
+      const operatorWidth = getPhysicalWidth(operator);
+      const decorationLocation = text.length;
+
+      let operatorType: keyof typeof operatorGroups | undefined = undefined;
+      for (const group in operatorGroups) {
+        if (
+          operatorGroups[group as keyof typeof operatorGroups].includes(
+            operator
+          )
+        ) {
+          operatorType = group as keyof typeof operatorGroups;
+          break;
+        }
+      }
+
+      if (!operatorType) {
+        throw new Error(`Unknown operator type for operator: ${operator}`);
+      }
+
+      const linePart: LinePart = {
+        text,
+        length: part.length,
+        width,
+        operator,
+        operatorWidth,
+        operatorType: operatorType as keyof typeof operatorGroups,
+        decorationLocation,
+        decoratorChar,
+      };
+      parts.push(linePart);
+    }
+
+    let prefix = "";
+
+    if (parts.length > 0 && parts[0].operatorType === "assignment") {
+      const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
+      if (prefixMatch) {
+        prefix = prefixMatch[1];
+      }
+    }
+
+    return new LineData(indentation, prefix, parts);
+  }
+
   compare(other: LineData) {
     if (this.indentation !== other.indentation) {
       return false;
