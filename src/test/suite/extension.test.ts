@@ -61,5 +61,52 @@ suite("Bicep Test Suite", () => {
       5,
       "JSX should be split into five parts"
     );
+    assert.strictEqual(test5.parts[0].text, '<Route path="');
+    assert.strictEqual(test5.parts[0].operator, "/>");
+    assert.strictEqual(test5.parts[0].operatorType, "jsx");
+    assert.strictEqual(test5.parts[1].text, ' element={<HomePage ');
+    assert.strictEqual(test5.parts[1].operator, "/>");
+    assert.strictEqual(test5.parts[1].operatorType, "jsx");
+  });
+
+  const case6 = '<Route path="/plan" element={<PlanPage />} />';
+  const test6 = LineData.fromString(case6);
+  test("Test JSX Alignment", () => {
+    assert.strictEqual(test6.prefix, "", "JSX prefix should be empty");
+    assert.strictEqual(
+      test6.parts.length,
+      5,
+      "JSX should be split into five parts"
+    );
+    assert.strictEqual(test6.parts[0].text, '<Route path="');
+    assert.strictEqual(test6.parts[0].operator, "/>");
+    assert.strictEqual(test6.parts[0].operatorType, "jsx");
+    assert.strictEqual(test6.parts[1].text, ' element={<PlanPage ');
+    assert.strictEqual(test6.parts[1].operator, "/>");
+    assert.strictEqual(test6.parts[1].operatorType, "jsx");
+  });
+
+  const case7 = `
+    <Route path="/"        element={<HomePage    />} />
+    <Route path="/plan"    element={<PlanPage    />} />
+    <Route path="/develop" element={<DevelopPage />} />
+    <Route path="/release" element={<ReleasePage />} />
+    <Route path="/review"  element={<ReviewPage  />} />
+    <Route path="/monitor" element={<MonitorPage />} />
+  `;
+  const test7 = LineData.fromString(case7);
+  test("Test Route Elements Alignment", () => {
+    assert.strictEqual(test7.prefix, "", "Route prefix should be empty");
+    assert.strictEqual(
+      test7.parts.length,
+      6,
+      "Route elements should be split into six parts"
+    );
+    assert.strictEqual(test7.parts[0].text, '<Route path="/"        element={<HomePage    />} />');
+    assert.strictEqual(test7.parts[1].text, '<Route path="/plan"    element={<PlanPage    />} />');
+    assert.strictEqual(test7.parts[2].text, '<Route path="/develop" element={<DevelopPage />} />');
+    assert.strictEqual(test7.parts[3].text, '<Route path="/release" element={<ReleasePage />} />');
+    assert.strictEqual(test7.parts[4].text, '<Route path="/review"  element={<ReviewPage  />} />');
+    assert.strictEqual(test7.parts[5].text, '<Route path="/monitor" element={<MonitorPage />} />');
   });
 });
