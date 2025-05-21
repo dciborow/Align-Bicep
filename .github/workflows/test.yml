@@ -27,9 +27,9 @@ jobs:
       - name: Run tests with xvfb
         run: xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" npm test
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: test-results.xml
+      # - name: Upload test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: test-results
+      #     path: test-results.xml

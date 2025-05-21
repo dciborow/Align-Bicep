@@ -71,8 +71,9 @@ export const getLineMatch = () =>
     `(.*?(.))(${operatorsSorted
       .map(
         (operator) =>
-          (operatorsGroup[operator] === "types" ||
-          operatorsGroup[operator] === "jsx"
+          (operatorsGroup[operator] === "types"
+            ? `\\b${operator}\\b`
+            : operatorsGroup[operator] === "jsx"
             ? operator
             : operator.replace(/(.)/g, "\\$1")) +
           (operatorsGroup[operator] === "binary" ? "(?=\\s)" : "")
