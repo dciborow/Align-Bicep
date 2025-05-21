@@ -1,4 +1,5 @@
 # Align Bicep
+Now maintained with Copilot.
 
 Based on https://github.com/OldStarchy/Align-Spaces
 
