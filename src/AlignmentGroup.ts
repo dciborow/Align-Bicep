@@ -12,9 +12,12 @@ export default class AlignmentGroup {
   }
 
   resolveAlignment(): DecorationSet {
-    const colWidths: number[] = [];
+    const colWidths = this.calculateColumnWidths();
+    return this.applyDecorations(colWidths);
+  }
 
-    const decorations = new DecorationSet();
+  private calculateColumnWidths(): number[] {
+    const colWidths: number[] = [];
 
     this.lines.forEach((line) => {
       line.parts.forEach((part, i) => {
@@ -25,6 +28,12 @@ export default class AlignmentGroup {
         }
       });
     });
+
+    return colWidths;
+  }
+
+  private applyDecorations(colWidths: number[]): DecorationSet {
+    const decorations = new DecorationSet();
 
     this.lines.forEach((line, index) => {
       const currentLine = this.lineStart + index;
