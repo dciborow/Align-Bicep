@@ -61,5 +61,51 @@ suite("Bicep Test Suite", () => {
       5,
       "JSX should be split into five parts"
     );
+    assert.strictEqual(
+      test5.parts[0].text,
+      "<Route ",
+      "First part should be '<Route '"
+    );
+    assert.strictEqual(
+      test5.parts[1].text,
+      'path="/" ',
+      "Second part should be 'path=\"/\" '"
+    );
+    assert.strictEqual(
+      test5.parts[2].text,
+      "element={",
+      "Third part should be 'element={'"
+    );
+    assert.strictEqual(
+      test5.parts[3].text,
+      "<HomePage ",
+      "Fourth part should be '<HomePage '"
+    );
+    assert.strictEqual(
+      test5.parts[4].text,
+      "/>} />",
+      "Fifth part should be '/>} />'"
+    );
+  });
+
+  const case6 = "  var indentedVariable = 42";
+  const test6 = LineData.fromString(case6);
+  test("Test Indentation", () => {
+    assert.strictEqual(test6.indentation, "  ");
+    assert.strictEqual(test6.prefix, "");
+    assert.strictEqual(test6.parts[0].text, "var indentedVariable ");
+    assert.strictEqual(test6.parts[0].operator, "=");
+    assert.strictEqual(test6.parts[0].operatorType, "assignment");
+  });
+
+  const case7 = "const operatorGroupTest = findOperatorGroup('=')";
+  const test7 = LineData.fromString(case7);
+  test("Test findOperatorGroup", () => {
+    assert.strictEqual(LineData["findOperatorGroup"]("="), "assignment");
+    assert.strictEqual(LineData["findOperatorGroup"]("+"), "binary");
+    assert.strictEqual(LineData["findOperatorGroup"]("==="), "comparison");
+    assert.strictEqual(LineData["findOperatorGroup"]("."), "index");
+    assert.strictEqual(LineData["findOperatorGroup"]("<"), "jsx");
+    assert.strictEqual(LineData["findOperatorGroup"]("string"), "types");
   });
 });
