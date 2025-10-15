@@ -77,12 +77,18 @@ export default class LineData {
 
     let prefix = "";
 
+    // Prefix detection disabled to fix issue with identifiers containing dots
+    // The original logic incorrectly treated identifiers like "system.debug" as having
+    // a prefix "system.", causing them to not align with other simple identifiers.
+    // TODO: Re-enable prefix detection with language-specific logic if needed for object property grouping
+    /*
     if (parts.length > 0 && parts[0].operatorType === "assignment") {
       const prefixMatch = /^\s*(.*(?:\.|->))\w+/.exec(parts[0].text);
       if (prefixMatch) {
         prefix = prefixMatch[1];
       }
     }
+    */
 
     return new LineData(indentation, prefix, parts);
   }

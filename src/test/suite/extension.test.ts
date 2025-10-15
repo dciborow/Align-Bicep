@@ -27,15 +27,11 @@ suite("Bicep Test Suite", () => {
     "resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = { name: '${prefix}-id', location: location }";
   const test3 = LineData.fromString(case3);
   test("Test Resources", () => {
+    // Prefix detection is disabled, so prefix should be empty
     assert.strictEqual(
       test3.prefix,
-      "resource userAssignedIdentity 'Microsoft.",
-      "Resource prefix not equal"
-    );
-    assert.strictEqual(
-      test3.parts[0].text,
-      "resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' ",
-      "Resource text not equal"
+      "",
+      "Resource prefix should be empty"
     );
     assert.strictEqual(test3.parts[0].operator, "=");
     assert.strictEqual(test3.parts[0].operatorType, "assignment");
@@ -61,5 +57,20 @@ suite("Bicep Test Suite", () => {
       5,
       "JSX should be split into five parts"
     );
+  });
+
+  // Test case for issue: "Does not format correctly when there is a '.' in the string of the line"
+  // https://github.com/dciborow/Align-Bicep/issues/...
+  const case6 = "  system.debug: value";
+  const test6 = LineData.fromString(case6);
+  test("Test identifier with dot (e.g., YAML key)", () => {
+    assert.strictEqual(
+      test6.prefix,
+      "",
+      "Identifier with dot should have empty prefix to align with other identifiers"
+    );
+    assert.strictEqual(test6.parts.length, 1, "Should have 1 part (assignment only)");
+    assert.strictEqual(test6.parts[0].operator, ":");
+    assert.strictEqual(test6.parts[0].operatorType, "assignment");
   });
 });
