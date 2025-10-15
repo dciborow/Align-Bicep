@@ -49,7 +49,7 @@ jobs:
         if: steps.tag_version.outputs.release_type
       - name: Publish to Visual Studio Marketplace
         if: steps.tag_version.outputs.release_type
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.ADO_PAT }}
           registryUrl: https://marketplace.visualstudio.com
